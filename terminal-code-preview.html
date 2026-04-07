@@ -15,19 +15,19 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #f5f5f5;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        .container {
-            display: flex;
-            height: 100vh;
-            gap: 20px;
+            min-height: 100vh;
             padding: 20px;
         }
 
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
         .section {
-            flex: 1;
             display: flex;
             flex-direction: column;
             background: white;
@@ -60,6 +60,7 @@
             outline: none;
             color: #333;
             background: white;
+            min-height: 400px;
         }
 
         textarea::placeholder {
@@ -72,16 +73,17 @@
             border-top: 1px solid #eee;
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         button {
-            padding: 10px 20px;
+            padding: 10px 15px;
             border: none;
             border-radius: 4px;
             background: #007bff;
             color: white;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             transition: background 0.2s;
         }
 
@@ -93,61 +95,157 @@
             transform: scale(0.98);
         }
 
-        .terminal {
+        .controls {
+            padding: 15px;
+            background: #f9f9f9;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .terminal-type-selector {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .terminal-type-selector label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            cursor: pointer;
+            background: white;
+        }
+
+        .preview-container {
+            padding: 20px;
+            min-height: 200px;
             flex: 1;
             display: flex;
             flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .terminal {
+            display: inline-block;
             background: #1e1e1e;
             color: #00ff00;
             font-family: 'Courier New', monospace;
             font-size: 14px;
             line-height: 1.6;
+            border-radius: 6px;
             overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             position: relative;
+            max-width: 100%;
+            min-width: fit-content;
+            width: fit-content;
         }
 
-        #terminal-output {
-            flex: 1;
+        .terminal-header {
+            background: #323232;
+            padding: 8px 12px;
+            font-size: 12px;
+            color: #999;
+            border-bottom: 1px solid #444;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        .terminal-title {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .terminal-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+
+        .dot-red {
+            background: #ff5f56;
+        }
+
+        .dot-yellow {
+            background: #ffbd2e;
+        }
+
+        .dot-green {
+            background: #27c93f;
+        }
+
+        .terminal-content {
             padding: 15px;
-            overflow-y: auto;
             white-space: pre-wrap;
             word-wrap: break-word;
-            outline: none;
+            color: #00ff00;
+            overflow-x: auto;
         }
 
-        #terminal-output::-webkit-scrollbar {
-            width: 8px;
+        .terminal-content::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
         }
 
-        #terminal-output::-webkit-scrollbar-track {
-            background: #333;
+        .terminal-content::-webkit-scrollbar-track {
+            background: #2d2d2d;
         }
 
-        #terminal-output::-webkit-scrollbar-thumb {
-            background: #666;
-            border-radius: 4px;
+        .terminal-content::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 3px;
         }
 
-        #terminal-output::-webkit-scrollbar-thumb:hover {
-            background: #888;
+        .terminal-content::-webkit-scrollbar-thumb:hover {
+            background: #777;
         }
 
-        .terminal::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            pointer-events: none;
-            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        .cmd-prompt {
+            color: #00ff00;
+            margin-right: 5px;
+        }
+
+        .powershell-prompt {
+            color: #0078d4;
+            margin-right: 5px;
+        }
+
+        .bash-prompt {
+            color: #4ef200;
+            margin-right: 5px;
+        }
+
+        .zsh-prompt {
+            color: #08deff;
+            margin-right: 5px;
+        }
+
+        .button-bar-bottom {
+            padding: 15px;
+            background: #f9f9f9;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
         }
 
         @media (max-width: 1024px) {
             .container {
-                flex-direction: column;
-                gap: 10px;
-                padding: 10px;
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -172,11 +270,34 @@ show running-config > backup.txt</textarea>
         </div>
 
         <div class="section">
-            <div class="section-title">🖥️ Terminal Preview</div>
-            <div class="terminal">
-                <div id="terminal-output"></div>
+            <div class="controls">
+                <div class="terminal-type-selector">
+                    <label for="terminal-type">Terminal Type:</label>
+                    <select id="terminal-type" onchange="updateTerminal()">
+                        <option value="cmd">Command Prompt (CMD)</option>
+                        <option value="powershell">PowerShell</option>
+                        <option value="bash">Bash</option>
+                        <option value="zsh">Zsh</option>
+                        <option value="generic">Generic Terminal</option>
+                    </select>
+                </div>
             </div>
-            <div class="button-bar">
+
+            <div class="preview-container">
+                <div class="terminal" id="terminal-container">
+                    <div class="terminal-header">
+                        <div class="terminal-title">
+                            <span class="terminal-dot dot-red"></span>
+                            <span class="terminal-dot dot-yellow"></span>
+                            <span class="terminal-dot dot-green"></span>
+                            <span id="terminal-name">Terminal</span>
+                        </div>
+                    </div>
+                    <div class="terminal-content" id="terminal-output"></div>
+                </div>
+            </div>
+
+            <div class="button-bar-bottom">
                 <button onclick="takeScreenshot()">📸 Take Screenshot</button>
             </div>
         </div>
@@ -185,16 +306,100 @@ show running-config > backup.txt</textarea>
     <script>
         const inputText = document.getElementById('input-text');
         const terminalOutput = document.getElementById('terminal-output');
+        const terminalType = document.getElementById('terminal-type');
+        const terminalName = document.getElementById('terminal-name');
 
         // Update terminal on input
         inputText.addEventListener('input', updateTerminal);
         inputText.addEventListener('change', updateTerminal);
+        terminalType.addEventListener('change', updateTerminal);
 
         // Initialize terminal on page load
         window.addEventListener('load', updateTerminal);
 
+        function getPrompt() {
+            const type = terminalType.value;
+            switch(type) {
+                case 'cmd':
+                    return 'C:\\Users\\User> ';
+                case 'powershell':
+                    return 'PS C:\\Users\\User> ';
+                case 'bash':
+                    return 'user@machine:~$ ';
+                case 'zsh':
+                    return 'user@machine ~ % ';
+                default:
+                    return '$ ';
+            }
+        }
+
+        function getTerminalName() {
+            const type = terminalType.value;
+            switch(type) {
+                case 'cmd':
+                    return 'Command Prompt';
+                case 'powershell':
+                    return 'PowerShell';
+                case 'bash':
+                    return 'Bash Terminal';
+                case 'zsh':
+                    return 'Zsh Terminal';
+                default:
+                    return 'Terminal';
+            }
+        }
+
+        function getPromptClass() {
+            const type = terminalType.value;
+            switch(type) {
+                case 'cmd':
+                    return 'cmd-prompt';
+                case 'powershell':
+                    return 'powershell-prompt';
+                case 'bash':
+                    return 'bash-prompt';
+                case 'zsh':
+                    return 'zsh-prompt';
+                default:
+                    return '';
+            }
+        }
+
         function updateTerminal() {
-            terminalOutput.textContent = inputText.value;
+            const text = inputText.value;
+            const prompt = getPrompt();
+            const promptClass = getPromptClass();
+            
+            terminalName.textContent = getTerminalName();
+            
+            // Split text into lines
+            const lines = text.split('\n');
+            let output = '';
+            
+            lines.forEach((line, index) => {
+                if (line.trim()) {
+                    output += `<span class="${promptClass}">${escapeHtml(prompt)}</span>${escapeHtml(line)}`;
+                } else {
+                    output += '';
+                }
+                if (index < lines.length - 1) {
+                    output += '\n';
+                }
+            });
+            
+            terminalOutput.textContent = '';
+            terminalOutput.innerHTML = output;
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
         }
 
         function clearInput() {
@@ -206,13 +411,15 @@ show running-config > backup.txt</textarea>
         }
 
         function takeScreenshot() {
-            const terminal = document.querySelector('.terminal');
+            const terminal = document.getElementById('terminal-container');
             
             html2canvas(terminal, {
                 backgroundColor: '#1e1e1e',
                 scale: 2,
                 useCORS: true,
-                logging: false
+                logging: false,
+                allowTaint: true,
+                backgroundColor: '#1e1e1e'
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.href = canvas.toDataURL('image/png');
