@@ -138,43 +138,42 @@
 
         .terminal {
             display: inline-block;
-            background: #1e1e1e;
-            color: #00ff00;
             font-family: 'Courier New', monospace;
             font-size: 14px;
             line-height: 1.6;
-            border-radius: 6px;
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             position: relative;
             max-width: 100%;
             min-width: fit-content;
             width: fit-content;
+            background: #1e1e1e;
+            color: #e8e8e8;
         }
 
         .terminal-header {
-            background: #323232;
-            padding: 8px 12px;
+            background: #353535;
+            padding: 10px 12px;
             font-size: 12px;
-            color: #999;
-            border-bottom: 1px solid #444;
             display: flex;
-            justify-content: flex-start;
+            justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid #444;
         }
 
         .terminal-title {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             align-items: center;
         }
 
         .terminal-dot {
             display: inline-block;
-            width: 8px;
-            height: 8px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
-            margin-right: 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
 
         .dot-red {
@@ -189,12 +188,18 @@
             background: #27c93f;
         }
 
+        .terminal-name {
+            color: #999;
+            font-size: 11px;
+            margin-left: 8px;
+        }
+
         .terminal-content {
             padding: 15px;
             white-space: pre-wrap;
             word-wrap: break-word;
-            color: #00ff00;
             overflow-x: auto;
+            color: #e8e8e8;
         }
 
         .terminal-content::-webkit-scrollbar {
@@ -203,7 +208,7 @@
         }
 
         .terminal-content::-webkit-scrollbar-track {
-            background: #2d2d2d;
+            background: #2a2a2a;
         }
 
         .terminal-content::-webkit-scrollbar-thumb {
@@ -215,24 +220,9 @@
             background: #777;
         }
 
-        .cmd-prompt {
-            color: #00ff00;
-            margin-right: 5px;
-        }
-
-        .powershell-prompt {
-            color: #0078d4;
-            margin-right: 5px;
-        }
-
-        .bash-prompt {
-            color: #4ef200;
-            margin-right: 5px;
-        }
-
-        .zsh-prompt {
-            color: #08deff;
-            margin-right: 5px;
+        .prompt {
+            color: #6a9955;
+            margin-right: 8px;
         }
 
         .button-bar-bottom {
@@ -253,7 +243,7 @@
 <body>
     <div class="container">
         <div class="section">
-            <div class="section-title">📝 Input Code/Commands</div>
+            <div class="section-title">Input Code/Commands</div>
             <div class="input-area">
                 <textarea id="input-text" placeholder="Paste your terminal commands here...">5.1 Backup Performed
 
@@ -274,11 +264,10 @@ show running-config > backup.txt</textarea>
                 <div class="terminal-type-selector">
                     <label for="terminal-type">Terminal Type:</label>
                     <select id="terminal-type" onchange="updateTerminal()">
-                        <option value="cmd">Command Prompt (CMD)</option>
-                        <option value="powershell">PowerShell</option>
                         <option value="bash">Bash</option>
+                        <option value="cmd">CMD</option>
+                        <option value="powershell">PowerShell</option>
                         <option value="zsh">Zsh</option>
-                        <option value="generic">Generic Terminal</option>
                     </select>
                 </div>
             </div>
@@ -290,7 +279,7 @@ show running-config > backup.txt</textarea>
                             <span class="terminal-dot dot-red"></span>
                             <span class="terminal-dot dot-yellow"></span>
                             <span class="terminal-dot dot-green"></span>
-                            <span id="terminal-name">Terminal</span>
+                            <span class="terminal-name" id="terminal-name">bash</span>
                         </div>
                     </div>
                     <div class="terminal-content" id="terminal-output"></div>
@@ -325,9 +314,9 @@ show running-config > backup.txt</textarea>
                 case 'powershell':
                     return 'PS C:\\Users\\User> ';
                 case 'bash':
-                    return 'user@machine:~$ ';
+                    return '$ ';
                 case 'zsh':
-                    return 'user@machine ~ % ';
+                    return '% ';
                 default:
                     return '$ ';
             }
@@ -337,38 +326,21 @@ show running-config > backup.txt</textarea>
             const type = terminalType.value;
             switch(type) {
                 case 'cmd':
-                    return 'Command Prompt';
+                    return 'cmd';
                 case 'powershell':
-                    return 'PowerShell';
+                    return 'powershell';
                 case 'bash':
-                    return 'Bash Terminal';
+                    return 'bash';
                 case 'zsh':
-                    return 'Zsh Terminal';
+                    return 'zsh';
                 default:
-                    return 'Terminal';
-            }
-        }
-
-        function getPromptClass() {
-            const type = terminalType.value;
-            switch(type) {
-                case 'cmd':
-                    return 'cmd-prompt';
-                case 'powershell':
-                    return 'powershell-prompt';
-                case 'bash':
-                    return 'bash-prompt';
-                case 'zsh':
-                    return 'zsh-prompt';
-                default:
-                    return '';
+                    return 'terminal';
             }
         }
 
         function updateTerminal() {
             const text = inputText.value;
             const prompt = getPrompt();
-            const promptClass = getPromptClass();
             
             terminalName.textContent = getTerminalName();
             
@@ -378,7 +350,7 @@ show running-config > backup.txt</textarea>
             
             lines.forEach((line, index) => {
                 if (line.trim()) {
-                    output += `<span class="${promptClass}">${escapeHtml(prompt)}</span>${escapeHtml(line)}`;
+                    output += `<span class="prompt">${escapeHtml(prompt)}</span>${escapeHtml(line)}`;
                 } else {
                     output += '';
                 }
@@ -414,12 +386,10 @@ show running-config > backup.txt</textarea>
             const terminal = document.getElementById('terminal-container');
             
             html2canvas(terminal, {
-                backgroundColor: '#1e1e1e',
                 scale: 2,
                 useCORS: true,
                 logging: false,
-                allowTaint: true,
-                backgroundColor: '#1e1e1e'
+                allowTaint: true
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.href = canvas.toDataURL('image/png');
