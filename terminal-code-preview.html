@@ -22,9 +22,12 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            display: flex;
             gap: 20px;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            flex-wrap: wrap;
         }
 
         .section {
@@ -34,6 +37,8 @@
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            flex: 1;
+            min-width: 400px;
         }
 
         .section-title {
@@ -48,6 +53,7 @@
             flex: 1;
             display: flex;
             flex-direction: column;
+            min-height: 500px;
         }
 
         textarea {
@@ -60,7 +66,6 @@
             outline: none;
             color: #333;
             background: white;
-            min-height: 400px;
         }
 
         textarea::placeholder {
@@ -129,11 +134,12 @@
 
         .preview-container {
             padding: 20px;
-            min-height: 200px;
             flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
+            justify-content: center;
+            align-items: center;
+            min-height: 500px;
         }
 
         .terminal {
@@ -235,7 +241,12 @@
 
         @media (max-width: 1024px) {
             .container {
-                grid-template-columns: 1fr;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .section {
+                min-width: 100%;
             }
         }
     </style>
@@ -243,7 +254,7 @@
 <body>
     <div class="container">
         <div class="section">
-            <div class="section-title">Input Code/Commands</div>
+            <div class="section-title">📝 Input Code/Commands</div>
             <div class="input-area">
                 <textarea id="input-text" placeholder="Paste your terminal commands here...">5.1 Backup Performed
 
@@ -389,10 +400,42 @@ show running-config > backup.txt</textarea>
                 scale: 2,
                 useCORS: true,
                 logging: false,
-                allowTaint: true
+                allowTaint: true,
+                backgroundColor: null,
+                borderRadius: 8
             }).then(canvas => {
+                // Create a new canvas with rounded corners
+                const ctx = canvas.getContext('2d');
+                const width = canvas.width;
+                const height = canvas.height;
+                const radius = 16; // Rounded corner radius (scaled for 2x)
+                
+                // Create a new canvas
+                const finalCanvas = document.createElement('canvas');
+                finalCanvas.width = width;
+                finalCanvas.height = height;
+                const finalCtx = finalCanvas.getContext('2d');
+                
+                // Draw rounded rectangle path
+                finalCtx.beginPath();
+                finalCtx.moveTo(radius, 0);
+                finalCtx.lineTo(width - radius, 0);
+                finalCtx.quadraticCurveTo(width, 0, width, radius);
+                finalCtx.lineTo(width, height - radius);
+                finalCtx.quadraticCurveTo(width, height, width - radius, height);
+                finalCtx.lineTo(radius, height);
+                finalCtx.quadraticCurveTo(0, height, 0, height - radius);
+                finalCtx.lineTo(0, radius);
+                finalCtx.quadraticCurveTo(0, 0, radius, 0);
+                finalCtx.closePath();
+                finalCtx.clip();
+                
+                // Draw the original canvas onto the clipped area
+                finalCtx.drawImage(canvas, 0, 0);
+                
+                // Download the final image
                 const link = document.createElement('a');
-                link.href = canvas.toDataURL('image/png');
+                link.href = finalCanvas.toDataURL('image/png');
                 link.download = `terminal-${Date.now()}.png`;
                 link.click();
             }).catch(err => {
